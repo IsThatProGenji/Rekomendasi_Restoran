@@ -18,7 +18,7 @@ import {
 import { HamburgerIcon } from '@chakra-ui/icons'
 import ThemeToggleButton from './theme-toggle-button'
 import { IoLogoGithub } from 'react-icons/io5'
-
+import DrawerExample from './drawer'
 const LinkItem = ({ href, path, target, children, ...props }) => {
   const active = path === href
   const inactiveColor = useColorModeValue('gray.800', 'whiteAlpha.900')
@@ -55,8 +55,6 @@ const Navbar = props => {
       zIndex={2}
       {...props}
     >
-
-    
       <Container
         display="flex"
         p={2}
@@ -65,7 +63,7 @@ const Navbar = props => {
         align="center"
         justify="space-between"
       >
-        <Flex align="center" mr={5}>
+        <Flex align="center" mr={0}>
           <Heading as="h1" size="lg" letterSpacing={'tighter'}>
             <Logo />
           </Heading>
@@ -101,7 +99,11 @@ const Navbar = props => {
         </Stack>
 
         <Box flex={1} align="right">
-          <ThemeToggleButton />
+          <ThemeToggleButton mr={2} />
+
+          <Box ml={2} display={{ base: 'inline-block' }}>
+            <DrawerExample />
+          </Box>
 
           <Box ml={2} display={{ base: 'inline-block', md: 'none' }}>
             <Menu isLazy id="navbar-menu">
@@ -135,9 +137,6 @@ const Navbar = props => {
           </Box>
         </Box>
       </Container>
-
-
-      
     </Box>
   )
 }

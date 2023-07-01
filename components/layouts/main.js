@@ -3,8 +3,6 @@ import NavBar from '../navbar'
 import { Box, Container } from '@chakra-ui/react'
 import Footer from '../footer'
 
-
-
 const Main = ({ children, router }) => {
   return (
     <Box as="main" pb={8}>
@@ -30,8 +28,6 @@ const Main = ({ children, router }) => {
       <NavBar path={router.asPath} />
 
       <Container maxW="2x1" pt={14}>
-    
-
         {children}
 
         <Footer />
