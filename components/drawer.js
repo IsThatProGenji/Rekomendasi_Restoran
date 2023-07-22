@@ -16,11 +16,16 @@ import {
   InputGroup,
   InputLeftAddon,
   InputRightAddon,
-  Textarea
+  Textarea,
+  Image,
+  Flex,
+  Text
 } from '@chakra-ui/react'
 import { LuShoppingCart } from 'react-icons/lu'
 import { useDisclosure } from '@chakra-ui/react'
 import React, { useRef } from 'react'
+import NumberInput from './numberinput'
+
 function DrawerExample() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = React.useRef()
@@ -39,7 +44,36 @@ function DrawerExample() {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth="1px">Shopping Cart</DrawerHeader>
-
+          <Flex>
+            <Box flex={1}>
+              {' '}
+              <Image
+                src={
+                  'https://static.vecteezy.com/system/resources/previews/006/096/450/original/cute-little-cat-sit-adorable-kitten-cartoon-pastel-color-vector.jpg'
+                }
+                borderRadius="lg"
+              />
+            </Box>
+            <Box flex={1}>
+              <Text>Nasi Goreng Kambing</Text>
+              <NumberInput />
+            </Box>
+          </Flex>
+          <Flex>
+            <Box flex={1}>
+              {' '}
+              <Image
+                src={
+                  'https://static.vecteezy.com/system/resources/previews/006/096/450/original/cute-little-cat-sit-adorable-kitten-cartoon-pastel-color-vector.jpg'
+                }
+                borderRadius="lg"
+              />
+            </Box>
+            <Box flex={1}>
+              <Text>Nasi Goreng Kambing</Text>
+              <NumberInput />
+            </Box>
+          </Flex>
           <DrawerBody>
             <Stack spacing="24px">
               <Box maxW={'50%'}>
