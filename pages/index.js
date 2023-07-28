@@ -52,6 +52,7 @@ const responsive = {
     slidesToSlide: 2 // optional, default to 1.
   }
 }
+
 function AirbnbCard() {
   const property = {
     imageUrl:
@@ -219,7 +220,18 @@ function Home() {
     )
   }
 
-  const { someValue, updateContextValue } = useContext(MyContext)
+  const {
+    someValue,
+    updateContextValue,
+    GetFullMenu,
+    fullMenu,
+    topSeller,
+    favorite,
+    filteredItems,
+    recommendationItems,
+    GetFullDrink,
+    fullDrink
+  } = useContext(MyContext)
   const [newValue, setNewValue] = useState('')
 
   const handleChange = event => {
@@ -230,82 +242,11 @@ function Home() {
     updateContextValue(newValue)
   }
 
-  const [items, setItems] = useState([])
-  const [favorite, setFavorite] = useState([])
-  const [promo, setPromo] = useState([])
   const [seasonal, setSeasonal] = useState([])
 
-  const app = initializeApp(firebaseConfig)
-  const db = getFirestore(app)
-  const q = query(
-    collection(db, 'makanan'),
-    orderBy('totalp', 'desc'),
-    limit(10)
-  )
-  const fav = query(
-    collection(db, 'makanan'),
-    orderBy('disukai', 'desc'),
-    limit(10)
-  )
-  const season = query(
-    collection(db, 'makanan'),
-    where('jenis', 'array-contains-any', ['Sate', 'Nasi Goreng']),
-    limit(10)
-  )
-  async function GetMenu() {
-    const querySnapshot = await getDocs(q)
-    const favSnapshot = await getDocs(fav)
-    const seasonSnapshot = await getDocs(season)
-    const newItems = []
-    const newFavs = []
-    const newSeasons = []
-    favSnapshot.forEach(doc => {
-      // doc.data() is never undefined for query doc snapshots
-      const newFav = {
-        nama: doc.data().nama,
-        harga: doc.data().harga,
-        jenis: doc.data().jenis,
-        disukai: doc.data().disukai,
-        totalp: doc.data().totalp,
-        url: doc.data().url
-      }
-      newFavs.push(newFav)
-      // console.log(doc.id, ' => ', doc.data())
-    })
-    seasonSnapshot.forEach(doc => {
-      // doc.data() is never undefined for query doc snapshots
-      const newSeason = {
-        nama: doc.data().nama,
-        harga: doc.data().harga,
-        jenis: doc.data().jenis,
-        disukai: doc.data().disukai,
-        totalp: doc.data().totalp,
-        url: doc.data().url
-      }
-      newSeasons.push(newSeason)
-      // console.log(doc.id, ' => ', doc.data())
-    })
-    querySnapshot.forEach(doc => {
-      // doc.data() is never undefined for query doc snapshots
-      const newItem = {
-        nama: doc.data().nama,
-        harga: doc.data().harga,
-        jenis: doc.data().jenis,
-        disukai: doc.data().disukai,
-        totalp: doc.data().totalp,
-        url: doc.data().url
-      }
-      newItems.push(newItem)
-      // console.log(doc.id, ' => ', doc.data())
-    })
-
-    setItems(newItems)
-    setFavorite(newFavs)
-    setSeasonal(newSeasons)
-  }
-
   useEffect(() => {
-    GetMenu()
+    GetFullMenu()
+    GetFullDrink()
     // const newItem = { firstname: 'Kaylee', lastname: 'Frye' }
     // setItems(prevItems => [...prevItems, newItem])
     // console.log(items)
@@ -317,6 +258,14 @@ function Home() {
         <div>Current Value: {someValue}</div>
         <input type="text" value={newValue} onChange={handleChange} />
         <button onClick={handleSubmit}>Update Value</button>
+      </div> */}
+      {/* <div>
+        {' '}
+        {recommendationItems.map(
+          (data, index) =>
+            // Step 2: Use map function to loop through the array and create a box with text
+            data.nama
+        )}
       </div> */}
       <Container maxW="x1" flexDirection="row">
         {/* Left Carousel */}
@@ -334,7 +283,7 @@ function Home() {
                 ssr={true}
                 itemClass="carousel-item-padding-40-px"
               >
-                {items.map((data, index) =>
+                {topSeller.map((data, index) =>
                   // Step 2: Use map function to loop through the array and create a box with text
                   foodCard(
                     data.nama,
@@ -393,7 +342,7 @@ function Home() {
                 ssr={true}
                 itemClass="carousel-item-padding-40-px"
               >
-                {seasonal.map((data, index) =>
+                {filteredItems.map((data, index) =>
                   // Step 2: Use map function to loop through the array and create a box with text
                   foodCard(
                     data.nama,
@@ -431,6 +380,55 @@ function Home() {
             </Box>
           </Flex>
         </Section>
+        <Box
+          flex={1}
+          px={2}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+        >
+          <Heading as="h3" variant="section-title" pl={2}>
+            Makanan
+          </Heading>
+          <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing={2}>
+            {fullMenu.map((data, index) =>
+              foodCard(
+                data.nama,
+                data.harga,
+                data.jenis,
+                data.url,
+                data.totalp,
+                data.disukai,
+                index
+              )
+            )}
+          </SimpleGrid>
+        </Box>
+        <Box
+          flex={1}
+          px={2}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+        >
+          <Heading as="h3" variant="section-title" pl={2}>
+            Minuman
+          </Heading>
+          <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing={2}>
+            {fullDrink.map((data, index) =>
+              foodCard(
+                data.nama,
+                data.harga,
+                data.jenis,
+                data.url,
+                data.totalp,
+                data.disukai,
+                index
+              )
+            )}
+          </SimpleGrid>
+        </Box>
+
         {/* Rest of the left side content */}
       </Container>
     </Layout>

@@ -48,9 +48,9 @@ function DrawerExample() {
     orders,
     calculateTotalPrice,
     addOrder,
-    getAllJenis,
-    allJenis,
-    seasonal
+    seasonal,
+    topSeller,
+    recommendationItems
   } = useContext(MyContext)
 
   useEffect(() => {
@@ -85,7 +85,13 @@ function DrawerExample() {
       formattedPrice: harga
     }
     const handleSubmit = () => {
-      addOrder(property.title, property.formattedPrice, property.imageUrl, 1)
+      addOrder(
+        property.title,
+        property.formattedPrice,
+        property.imageUrl,
+        1,
+        jenis
+      )
       console.log(orders)
     }
     const renderInputOrButton = () => {
@@ -226,7 +232,7 @@ function DrawerExample() {
                     ssr={true}
                     itemClass="carousel-item-padding-40-px"
                   >
-                    {seasonal.map((data, index) =>
+                    {recommendationItems.map((data, index) =>
                       // Step 2: Use map function to loop through the array and create a box with text
                       foodCard(
                         data.nama,
