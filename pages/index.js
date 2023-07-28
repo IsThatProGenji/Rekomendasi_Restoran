@@ -5,35 +5,21 @@ import {
   Heading,
   Box,
   SimpleGrid,
-  Button,
-  List,
-  ListItem,
-  useColorModeValue,
-  chakra,
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Stack,
-  Text,
-  Divider,
-  Image,
-  Grid,
-  GridItem,
   Flex,
   Badge,
   IconButton,
-  Img
+  Img,
+  Button
 } from '@chakra-ui/react'
 import { ChevronRightIcon, EmailIcon, StarIcon } from '@chakra-ui/icons'
-
+import NumberInput from '../components/numberinput'
 import Layout from '../components/layouts/article'
 import Section from '../components/section'
 
 import Carousel from 'react-multi-carousel'
 import 'react-multi-carousel/lib/styles.css'
-
-import { useEffect, useState } from 'react'
+import MyContext from '../components/myContext'
+import React, { createContext, useEffect, useState, useContext } from 'react'
 import GetMenu from '../firebase/clientApp'
 import { initializeApp } from 'firebase/app'
 import {
@@ -43,18 +29,11 @@ import {
   getDocs,
   query,
   orderBy,
-  limit
+  limit,
+  where
 } from 'firebase/firestore'
-
-const firebaseConfig = {
-  apiKey: 'AIzaSyDE-1OZl0wNOQxxrZST194KD3U1kLW9Qy4',
-  authDomain: 'restaurant-7305c.firebaseapp.com',
-  projectId: 'restaurant-7305c',
-  storageBucket: 'restaurant-7305c.appspot.com',
-  messagingSenderId: '872390095470',
-  appId: '1:872390095470:web:ef12a7ed5bfe5d2ddd2c7f',
-  measurementId: 'G-9DGLGTQ0X0'
-}
+import { formatToRupiah } from '../components/formatPrice'
+import firebaseConfig from '../components/firebaseConfig'
 
 const responsive = {
   desktop: {
@@ -73,98 +52,147 @@ const responsive = {
     slidesToSlide: 2 // optional, default to 1.
   }
 }
+function AirbnbCard() {
+  const property = {
+    imageUrl:
+      'https://firebasestorage.googleapis.com/v0/b/restaurant-7305c.appspot.com/o/Ayam%20Katsu.jpg?alt=media&token=d53dbb75-69e9-4dbb-8e47-e4426c096b48',
+    imageAlt: 'food katsu',
+    beds: 3,
+    baths: 2,
+    title: 'Modern home in city center in the heart of historic Los Angeles',
+    formattedPrice: '$1,900.00',
+    reviewCount: 34,
+    rating: 4
+  }
+
+  return (
+    <Box paddingX={{ base: 1, md: 2 }}>
+      <Box borderWidth="1px" borderRadius="lg" overflow="hidden">
+        <Img
+          src={property.imageUrl}
+          alt={property.imageAlt}
+          borderRadius="lg"
+        />
+
+        <Box p="6">
+          <Box display="flex" alignItems="baseline">
+            <Badge borderRadius="full" px="2" colorScheme="teal">
+              New
+            </Badge>
+            <Box
+              color="gray.500"
+              fontWeight="semibold"
+              letterSpacing="wide"
+              fontSize="xs"
+              textTransform="uppercase"
+              ml="2"
+              noOfLines={1}
+            >
+              {property.beds} beds &bull; {property.baths} baths
+            </Box>
+          </Box>
+
+          <Box
+            mt="1"
+            fontWeight="semibold"
+            as="h4"
+            lineHeight="tight"
+            noOfLines={1}
+          >
+            {property.title}
+          </Box>
+
+          <Box>
+            {property.formattedPrice}
+            <Box as="span" color="gray.600" fontSize="sm">
+              / wk
+            </Box>
+          </Box>
+
+          <Box display="flex" mt="2" alignItems="center">
+            {Array(5)
+              .fill('')
+              .map((_, i) => (
+                <StarIcon
+                  key={i}
+                  color={i < property.rating ? 'teal.500' : 'gray.300'}
+                />
+              ))}
+            <Box as="span" ml="2" color="gray.600" fontSize="sm" noOfLines={1}>
+              {property.reviewCount} reviews
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  )
+}
+// Function to generate a random color
 
 function Home() {
-  const [items, setItems] = useState([])
-  async function GetMenu() {
-    const app = initializeApp(firebaseConfig)
-    const db = getFirestore(app)
-    const q = query(collection(db, 'makanan'), orderBy('nama', 'asc'), limit(5))
+  const { orders, addOrder } = useContext(MyContext)
 
-    try {
-      const querySnapshot = await getDocs(q)
-      const newItems = []
-      querySnapshot.forEach(doc => {
-        // doc.data() is never undefined for query doc snapshots
-        const newItem = {
-          nama: doc.data().nama,
-          harga: doc.data().harga,
-          jenis: doc.data().jenis,
-          disukai: doc.data().disukai,
-          totalp: doc.data().totalp,
-          url: doc.data().url
-        }
-        newItems.push(newItem)
-        // console.log(doc.id, ' => ', doc.data())
-      })
+  // Function to render NumberInput if orders are not null
 
-      setItems(prevItems => [...prevItems, ...newItems])
-      console.log('Items fetched and updated:', [...items, ...newItems])
-      return newItems
-    } catch (e) {
-      console.error('Error adding document: ', e)
-      return []
-    }
-  }
-
-  useEffect(() => {
-    GetMenu()
-    // const newItem = { firstname: 'Kaylee', lastname: 'Frye' }
-    // setItems(prevItems => [...prevItems, newItem])
-    // console.log(items)
-  }, [])
-
-  function MyButton() {
-    const handleClick = () => {
-      setItems([...items, newItem])
-      console.log(items)
-      // getMenu() // This will be logged to the console when the button is clicked.
-    }
-
-    return (
-      <Button onClick={handleClick} colorScheme="teal">
-        Click Me
-      </Button>
-    )
-  }
-  function AirbnbCard() {
+  function foodCard(nama, harga, jenis, url, totalp, disukai, index) {
     const property = {
-      imageUrl:
-        'https://firebasestorage.googleapis.com/v0/b/restaurant-7305c.appspot.com/o/Ayam%20Katsu.jpg?alt=media&token=d53dbb75-69e9-4dbb-8e47-e4426c096b48',
+      imageUrl: url,
       imageAlt: 'food katsu',
-      beds: 3,
-      baths: 2,
-      title: 'Modern home in city center in the heart of historic Los Angeles',
-      formattedPrice: '$1,900.00',
-      reviewCount: 34,
-      rating: 4
+      title: nama,
+      formattedPrice: harga
     }
+    const handleSubmit = () => {
+      addOrder(
+        property.title,
+        property.formattedPrice,
+        property.imageUrl,
+        1,
+        jenis
+      )
 
+      console.log(orders)
+    }
+    const renderInputOrButton = () => {
+      const hasTitle = orders.some(order => order.nama === property.title)
+      if (!hasTitle) {
+        return (
+          <Button borderRadius="full" size="sm" onClick={handleSubmit}>
+            Add To Cart
+          </Button>
+        )
+      } else {
+        return (
+          <Box maxW="125px">
+            <NumberInput nama={property.title} />
+          </Box>
+        )
+      }
+    }
     return (
-      <Box paddingX={{ base: 1, md: 2 }}>
-        <Box borderWidth="1px" borderRadius="lg" overflow="hidden">
+      <Box key={index} paddingX={{ base: 1, md: 2 }}>
+        <Box borderWidth="2px" borderRadius="lg" overflow="hidden">
           <Img
             src={property.imageUrl}
             alt={property.imageAlt}
             borderRadius="lg"
+            objectFit="cover"
           />
 
-          <Box p="6">
-            <Box display="flex" alignItems="baseline">
-              <Badge borderRadius="full" px="2" colorScheme="teal">
-                New
-              </Badge>
-              <Box
-                color="gray.500"
-                fontWeight="semibold"
-                letterSpacing="wide"
-                fontSize="xs"
-                textTransform="uppercase"
-                ml="2"
-                noOfLines={1}
-              >
-                {property.beds} beds &bull; {property.baths} baths
-              </Box>
+          <Box p={5}>
+            <Box display="flex" alignItems="baseline" noOfLines={1}>
+              {jenis.map((item, index) => (
+                <Badge
+                  borderRadius="full"
+                  px="2"
+                  colorScheme={
+                    index === 0 ? 'teal' : index === 1 ? 'red' : 'purple'
+                  }
+                  key={index}
+                  mr={2}
+                >
+                  {jenis[index]}
+                </Badge>
+              ))}
             </Box>
 
             <Box
@@ -177,41 +205,119 @@ function Home() {
               {property.title}
             </Box>
 
-            <Box>
-              {property.formattedPrice}
-              <Box as="span" color="gray.600" fontSize="sm">
-                / wk
-              </Box>
-            </Box>
+            <Box>{formatToRupiah(property.formattedPrice)}</Box>
 
-            <Box display="flex" mt="2" alignItems="center">
-              {Array(5)
-                .fill('')
-                .map((_, i) => (
-                  <StarIcon
-                    key={i}
-                    color={i < property.rating ? 'teal.500' : 'gray.300'}
-                  />
-                ))}
-              <Box
-                as="span"
-                ml="2"
-                color="gray.600"
-                fontSize="sm"
-                noOfLines={1}
-              >
-                {property.reviewCount} reviews
+            <Box display="flex" mt="2" alignItems="center" pb={2}>
+              <Box as="span" color="gray.600" fontSize="xs" noOfLines={1}>
+                {totalp} terjual | Disukai {disukai}
               </Box>
             </Box>
+            {renderInputOrButton()}
           </Box>
         </Box>
       </Box>
     )
   }
 
+  const { someValue, updateContextValue } = useContext(MyContext)
+  const [newValue, setNewValue] = useState('')
+
+  const handleChange = event => {
+    setNewValue(event.target.value)
+  }
+
+  const handleSubmit = () => {
+    updateContextValue(newValue)
+  }
+
+  const [items, setItems] = useState([])
+  const [favorite, setFavorite] = useState([])
+  const [promo, setPromo] = useState([])
+  const [seasonal, setSeasonal] = useState([])
+
+  const app = initializeApp(firebaseConfig)
+  const db = getFirestore(app)
+  const q = query(
+    collection(db, 'makanan'),
+    orderBy('totalp', 'desc'),
+    limit(10)
+  )
+  const fav = query(
+    collection(db, 'makanan'),
+    orderBy('disukai', 'desc'),
+    limit(10)
+  )
+  const season = query(
+    collection(db, 'makanan'),
+    where('jenis', 'array-contains-any', ['Sate', 'Nasi Goreng']),
+    limit(10)
+  )
+  async function GetMenu() {
+    const querySnapshot = await getDocs(q)
+    const favSnapshot = await getDocs(fav)
+    const seasonSnapshot = await getDocs(season)
+    const newItems = []
+    const newFavs = []
+    const newSeasons = []
+    favSnapshot.forEach(doc => {
+      // doc.data() is never undefined for query doc snapshots
+      const newFav = {
+        nama: doc.data().nama,
+        harga: doc.data().harga,
+        jenis: doc.data().jenis,
+        disukai: doc.data().disukai,
+        totalp: doc.data().totalp,
+        url: doc.data().url
+      }
+      newFavs.push(newFav)
+      // console.log(doc.id, ' => ', doc.data())
+    })
+    seasonSnapshot.forEach(doc => {
+      // doc.data() is never undefined for query doc snapshots
+      const newSeason = {
+        nama: doc.data().nama,
+        harga: doc.data().harga,
+        jenis: doc.data().jenis,
+        disukai: doc.data().disukai,
+        totalp: doc.data().totalp,
+        url: doc.data().url
+      }
+      newSeasons.push(newSeason)
+      // console.log(doc.id, ' => ', doc.data())
+    })
+    querySnapshot.forEach(doc => {
+      // doc.data() is never undefined for query doc snapshots
+      const newItem = {
+        nama: doc.data().nama,
+        harga: doc.data().harga,
+        jenis: doc.data().jenis,
+        disukai: doc.data().disukai,
+        totalp: doc.data().totalp,
+        url: doc.data().url
+      }
+      newItems.push(newItem)
+      // console.log(doc.id, ' => ', doc.data())
+    })
+
+    setItems(newItems)
+    setFavorite(newFavs)
+    setSeasonal(newSeasons)
+  }
+
+  useEffect(() => {
+    GetMenu()
+    // const newItem = { firstname: 'Kaylee', lastname: 'Frye' }
+    // setItems(prevItems => [...prevItems, newItem])
+    // console.log(items)
+  }, [])
+
   return (
     <Layout>
-      <MyButton></MyButton>
+      {/* <div>
+        <div>Current Value: {someValue}</div>
+        <input type="text" value={newValue} onChange={handleChange} />
+        <button onClick={handleSubmit}>Update Value</button>
+      </div> */}
       <Container maxW="x1" flexDirection="row">
         {/* Left Carousel */}
         <Section delay={0.4}>
@@ -222,14 +328,24 @@ function Home() {
                 Top Seller
               </Heading>
               <Carousel
+                // swipeable={false}
+                draggable={false}
                 responsive={responsive}
                 ssr={true}
                 itemClass="carousel-item-padding-40-px"
               >
-                <AirbnbCard />
-                <AirbnbCard />
-                <AirbnbCard />
-                <AirbnbCard />
+                {items.map((data, index) =>
+                  // Step 2: Use map function to loop through the array and create a box with text
+                  foodCard(
+                    data.nama,
+                    data.harga,
+                    data.jenis,
+                    data.url,
+                    data.totalp,
+                    data.disukai,
+                    index
+                  )
+                )}
               </Carousel>
 
               {/* Rest of the left side content */}
@@ -238,17 +354,26 @@ function Home() {
             {/* Right Carousel */}
             <Box flex={1} w={{ base: '100%', md: '50%' }} px={2}>
               <Heading as="h3" variant="section-title" pl={2}>
-                Top Seller
+                Favorite
               </Heading>
               <Carousel
                 responsive={responsive}
+                draggable={false}
                 ssr={true}
                 itemClass="carousel-item-padding-40-px"
               >
-                <AirbnbCard />
-                <AirbnbCard />
-                <AirbnbCard />
-                <AirbnbCard />
+                {favorite.map((data, index) =>
+                  // Step 2: Use map function to loop through the array and create a box with text
+                  foodCard(
+                    data.nama,
+                    data.harga,
+                    data.jenis,
+                    data.url,
+                    data.totalp,
+                    data.disukai,
+                    index
+                  )
+                )}
               </Carousel>
 
               {/* Rest of the right side content */}
@@ -260,17 +385,26 @@ function Home() {
             {/* Left Carousel */}
             <Box flex={1} px={2} w={{ base: '100%', md: '50%' }}>
               <Heading as="h3" variant="section-title" pl={2}>
-                Top Seller
+                Seasonal Menu
               </Heading>
               <Carousel
+                draggable={false}
                 responsive={responsive}
                 ssr={true}
                 itemClass="carousel-item-padding-40-px"
               >
-                <AirbnbCard />
-                <AirbnbCard />
-                <AirbnbCard />
-                <AirbnbCard />
+                {seasonal.map((data, index) =>
+                  // Step 2: Use map function to loop through the array and create a box with text
+                  foodCard(
+                    data.nama,
+                    data.harga,
+                    data.jenis,
+                    data.url,
+                    data.totalp,
+                    data.disukai,
+                    index
+                  )
+                )}
               </Carousel>
 
               {/* Rest of the left side content */}
@@ -279,9 +413,10 @@ function Home() {
             {/* Right Carousel */}
             <Box flex={1} w={{ base: '100%', md: '50%' }} px={2}>
               <Heading as="h3" variant="section-title" pl={2}>
-                Top Seller
+                Promo Deals
               </Heading>
               <Carousel
+                draggable={false}
                 responsive={responsive}
                 ssr={true}
                 itemClass="carousel-item-padding-40-px"

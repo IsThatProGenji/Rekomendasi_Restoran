@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { forwardRef, use, useContext } from 'react'
 import Logo from './logo'
 import NextLink from 'next/link'
 import {
@@ -19,6 +19,7 @@ import { HamburgerIcon } from '@chakra-ui/icons'
 import ThemeToggleButton from './theme-toggle-button'
 import { IoLogoGithub } from 'react-icons/io5'
 import DrawerExample from './drawer'
+import MyContext from './myContext'
 const LinkItem = ({ href, path, target, children, ...props }) => {
   const active = path === href
   const inactiveColor = useColorModeValue('gray.800', 'whiteAlpha.900')
@@ -44,7 +45,7 @@ const MenuLink = forwardRef((props, ref) => (
 
 const Navbar = props => {
   const { path } = props
-
+  const { someValue } = useContext(MyContext)
   return (
     <Box
       position="fixed"
@@ -78,7 +79,7 @@ const Navbar = props => {
           mt={{ base: 4, md: 0 }}
         >
           <LinkItem href="/works" path={path}>
-            Works
+            Works {someValue}
           </LinkItem>
           <LinkItem href="/posts" path={path}>
             Posts
