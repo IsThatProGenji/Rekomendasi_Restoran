@@ -9,17 +9,11 @@ import {
 import { useContext, useState } from 'react'
 import MyContext from './myContext'
 import { LuTrash2, LuPlus, LuMinus } from 'react-icons/lu'
-function NumberInput({ nama }) {
+function NumberInput2({ nama }) {
   const { setJumlah, orders, minJumlah, deleteOrder } = useContext(MyContext)
 
   const [value, setValue] = useState(1)
-  let order = null
-  for (const o of orders) {
-    if (o.nama === nama) {
-      order = o
-      break
-    }
-  }
+  const order = orders.find(order => order.nama === nama)
   const handleIncrement = () => {
     // When the "+" button is clicked, increment the value and update the context
     const newValue = value + 1
@@ -46,7 +40,7 @@ function NumberInput({ nama }) {
 
   return (
     <HStack>
-      {order != null && order.jumlah && order.jumlah === 1 ? (
+      {order.jumlah === 1 ? (
         <IconButton
           aria-label="Call Segun"
           icon={<LuTrash2 />}
@@ -63,7 +57,7 @@ function NumberInput({ nama }) {
       )}
       <Input
         size={'sm'}
-        value={order != null ? order.jumlah : 0}
+        value={order.jumlah}
         onChange={handleInputChange}
         min={0}
       />
@@ -77,4 +71,4 @@ function NumberInput({ nama }) {
     </HStack>
   )
 }
-export default NumberInput
+export default NumberInput2

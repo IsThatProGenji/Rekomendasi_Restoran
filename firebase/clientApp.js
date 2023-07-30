@@ -9,6 +9,7 @@ import {
   limit
 } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
+import { Tab } from 'react-md'
 const firebaseConfig = {
   apiKey: 'AIzaSyDE-1OZl0wNOQxxrZST194KD3U1kLW9Qy4',
   authDomain: 'restaurant-7305c.firebaseapp.com',
@@ -38,6 +39,35 @@ async function getCities() {
   }
 }
 
+async function submitOrder({
+  order,
+  nama,
+  nomeja,
+  opsi,
+  note,
+  feedback,
+  total
+}) {
+  const app = initializeApp(firebaseConfig)
+  const db = getFirestore(app)
+  const currentDate = new Date()
+  try {
+    const docRef = await addDoc(collection(db, 'order'), {
+      nama: nama,
+      order: order,
+      nomeja: nomeja,
+      opsi: opsi,
+      note: note,
+      feedback: feedback,
+      total: total,
+      date: currentDate
+    })
+    console.log('Document written with ID: ', docRef.id)
+  } catch (e) {
+    console.error('Error adding document: ', e)
+  }
+}
+
 async function GetMenu() {
   const [items, setItems] = useState()
   const app = initializeApp(firebaseConfig)
@@ -57,4 +87,4 @@ async function GetMenu() {
   console.log(items)
   return items
 }
-export default GetMenu
+export default submitOrder

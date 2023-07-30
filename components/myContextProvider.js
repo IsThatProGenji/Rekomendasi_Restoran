@@ -13,17 +13,18 @@ import {
   limit,
   where
 } from 'firebase/firestore'
-import { ReinhardToneMapping } from 'three'
 const MyContextProvider = ({ children }) => {
   // Define the state or data you want to share
   const [data, setData] = useState({
     someValue: 'Hello from Context!'
     // add more values as needed
   })
-  const [orders, setOrders] = useState([])
+  const getInitialOrders = () => []
+  const [orders, setOrders] = useState(getInitialOrders)
   const [fullMenu, setFullMenu] = useState([])
   const [topSeller, setTopSeller] = useState([])
   const [favorite, setFavorite] = useState([])
+  const [promo, setPromo] = useState([])
   const [filteredItems, setFilteredItems] = useState([])
   const [recommendationItems, setRecommendationItems] = useState([])
   const [fullDrink, setFullDrink] = useState([])
@@ -56,6 +57,7 @@ const MyContextProvider = ({ children }) => {
     GetTopSeller(newFulls)
     GetFavorite(newFulls)
     GetFilteredItems(newFulls)
+    GetPromoItems(newFulls)
   }
   async function GetFullDrink() {
     const full = query(collection(db, 'minuman'), orderBy('nama', 'asc'))
@@ -108,6 +110,15 @@ const MyContextProvider = ({ children }) => {
     setFilteredItems(limitedItems)
     // console.log('filter Menu:', limitedItems) //
   }
+  const GetPromoItems = items => {
+    // Filter the items with jenis 'Sate' or 'Nasi Goreng'
+    const filteredItems = items.filter(item => item.jenis.includes('promo'))
+
+    // Limit the result to 10 items
+    const limitedItems = filteredItems.slice(0, 10)
+    setPromo(limitedItems)
+    // console.log('filter Menu:', limitedItems) //
+  }
   const CombinedJenis = items => {
     // Create a Set to store unique "jenis" values
     const jenisSet = new Set()
@@ -129,8 +140,8 @@ const MyContextProvider = ({ children }) => {
         item.jenis.some(jenis => combinedJenisArray.includes(jenis))
       )
       .slice(0, 20)
-    console.log('jenis', combinedJenisArray)
-    console.log('itemjenis', itemsWithTargetJenis)
+    // console.log('jenis', combinedJenisArray)
+    // console.log('itemjenis', itemsWithTargetJenis)
     setRecommendationItems(itemsWithTargetJenis)
   }
   const updateContextValue = newValue => {
@@ -173,6 +184,10 @@ const MyContextProvider = ({ children }) => {
     CombinedJenis(updatedOrders)
     // console.log(nama)
   }
+  const resetOrder = () => {
+    setOrders(getInitialOrders())
+    // console.log(nama)
+  }
 
   const minJumlah = (nama, newJumlah) => {
     // Use the map function to create a new array with updated "jumlah" values
@@ -210,7 +225,9 @@ const MyContextProvider = ({ children }) => {
         filteredItems,
         recommendationItems,
         GetFullDrink,
-        fullDrink
+        fullDrink,
+        promo,
+        resetOrder
       }}
     >
       {children}

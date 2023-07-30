@@ -151,7 +151,7 @@ function Home() {
         jenis
       )
 
-      console.log(orders)
+      // console.log(orders)
     }
     const renderInputOrButton = () => {
       const hasTitle = orders.some(order => order.nama === property.title)
@@ -230,7 +230,8 @@ function Home() {
     filteredItems,
     recommendationItems,
     GetFullDrink,
-    fullDrink
+    fullDrink,
+    promo
   } = useContext(MyContext)
   const [newValue, setNewValue] = useState('')
 
@@ -370,10 +371,18 @@ function Home() {
                 ssr={true}
                 itemClass="carousel-item-padding-40-px"
               >
-                <AirbnbCard />
-                <AirbnbCard />
-                <AirbnbCard />
-                <AirbnbCard />
+                {promo.map((data, index) =>
+                  // Step 2: Use map function to loop through the array and create a box with text
+                  foodCard(
+                    data.nama,
+                    data.harga,
+                    data.jenis,
+                    data.url,
+                    data.totalp,
+                    data.disukai,
+                    index
+                  )
+                )}
               </Carousel>
 
               {/* Rest of the right side content */}

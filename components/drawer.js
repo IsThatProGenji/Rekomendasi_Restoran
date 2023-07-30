@@ -21,7 +21,11 @@ import {
   ScrollView,
   Heading,
   Img,
-  Badge
+  Badge,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription
 } from '@chakra-ui/react'
 import { LuShoppingCart } from 'react-icons/lu'
 import { useDisclosure } from '@chakra-ui/react'
@@ -42,7 +46,7 @@ import {
   where
 } from 'firebase/firestore'
 import Carousel from 'react-multi-carousel'
-
+import submitOrder from '../firebase/clientApp'
 function DrawerExample() {
   const {
     orders,
@@ -50,14 +54,11 @@ function DrawerExample() {
     addOrder,
     seasonal,
     topSeller,
-    recommendationItems
+    recommendationItems,
+    setOrders,
+    resetOrder
   } = useContext(MyContext)
 
-  useEffect(() => {
-    // const newItem = { firstname: 'Kaylee', lastname: 'Frye' }
-    // setItems(prevItems => [...prevItems, newItem])
-    // console.log(items)
-  }, [])
   const responsive = {
     desktop: {
       breakpoint: { max: 3000, min: 1024 },
@@ -92,7 +93,7 @@ function DrawerExample() {
         1,
         jenis
       )
-      console.log(orders)
+      // console.log(orders)
     }
     const renderInputOrButton = () => {
       const hasTitle = orders.some(order => order.nama === property.title)
@@ -164,6 +165,30 @@ function DrawerExample() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const totalPrice = formatToRupiah(calculateTotalPrice())
 
+  const [formValues, setFormValues] = useState({
+    nama: '',
+    noMeja: '',
+    option: 'dinein', // Default value for the "Choose an Option" select
+    orderNote: '',
+    feedback: ''
+  })
+  const handleChange = e => {
+    const { name, value } = e.target
+    setFormValues(prevValues => ({ ...prevValues, [name]: value }))
+  }
+  const submitOrderHandler = async () => {
+    submitOrder({
+      order: orders,
+      nama: formValues.nama,
+      feedback: formValues.feedback,
+      nomeja: formValues.noMeja,
+      note: formValues.orderNote,
+      opsi: formValues.option,
+      total: totalPrice
+    })
+    onClose()
+    resetOrder([])
+  }
   const btnRef = React.useRef()
   const OrderItem = ({ item, index }) => {
     return (
@@ -250,16 +275,21 @@ function DrawerExample() {
                 </Box>
                 <Box>
                   <FormLabel htmlFor="desc">Nama</FormLabel>
-                  <Input />
+                  <Input name="nama" onChange={handleChange} />
                 </Box>
                 <Flex>
                   <Box maxW={'30%'}>
                     <FormLabel htmlFor="option">No Meja</FormLabel>
-                    <Input />
+                    <Input name="noMeja" onChange={handleChange} />
                   </Box>
                   <Box pl={5}>
                     <FormLabel htmlFor="option">Choose an Option</FormLabel>
-                    <Select id="option" defaultValue="dinein">
+                    <Select
+                      id="option"
+                      name="option"
+                      defaultValue="dinein"
+                      onChange={handleChange}
+                    >
                       <option value="dinein">Dine In</option>
                       <option value="takeaway">Take Away</option>
                     </Select>
@@ -268,7 +298,15 @@ function DrawerExample() {
 
                 <Box>
                   <FormLabel htmlFor="desc">Order Note</FormLabel>
-                  <Textarea id="desc" />
+                  <Textarea
+                    id="desc"
+                    name="orderNote"
+                    onChange={handleChange}
+                  />
+                </Box>
+                <Box>
+                  <FormLabel htmlFor="desc">Feedback</FormLabel>
+                  <Textarea id="desc" name="feedback" onChange={handleChange} />
                 </Box>
 
                 <Box
@@ -289,7 +327,11 @@ function DrawerExample() {
               Cancel
             </Button>
 
-            {orders.length > 0 && <Button colorScheme="blue">Submit</Button>}
+            {orders.length > 0 && (
+              <Button colorScheme="blue" onClick={submitOrderHandler}>
+                Order
+              </Button>
+            )}
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
