@@ -1,4 +1,17 @@
-import { Box, Text, Badge } from '@chakra-ui/react'
+import { formatToRupiah } from './formatPrice'
+import {
+  Box,
+  Text,
+  Badge,
+  Container,
+  HStack,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td
+} from '@chakra-ui/react'
 
 const ReceiptCard = ({ orderData }) => {
   const { feedback, nama, nomeja, note, opsi, order, date, total } = orderData
@@ -17,14 +30,51 @@ const ReceiptCard = ({ orderData }) => {
   const seconds = String(formattedDate.getSeconds()).padStart(2, '0')
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center'
-      }}
-    >
+    <Container>
       <Box borderWidth="1px" borderRadius="md" p={4} mb={4} maxWidth="600px">
         {/* Order Feedback */}
+        {/* Order Details */}
+        <Box mb={4}>
+          <Badge colorScheme="teal" fontSize="sm" mb={2}>
+            Order Details
+          </Badge>
+          <Text>Nama: {nama}</Text>
+          <Text>No Meja: {nomeja}</Text>
+          <Text>Opsi: {opsi}</Text>
+          <Text>Note: {note}</Text>
+        </Box>
+        {/* Ordered Items */}
+        <Box>
+          <Badge colorScheme="teal" fontSize="sm" mb={2}>
+            Ordered Items
+          </Badge>
+          <Table variant="simple">
+            <Thead>
+              <Tr>
+                <Th>Item Name</Th>
+                <Th>Quantity</Th>
+                <Th>Price</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {order.map((item, index) => (
+                <Tr key={index}>
+                  <Td>{item.nama}</Td>
+                  <Td>{item.jumlah}</Td>
+                  <Td>{formatToRupiah(item.harga)}</Td>
+                </Tr>
+              ))}
+              <Tr>
+                <Td></Td>
+                <Td></Td>
+                <Td>Total: {total}</Td>
+              </Tr>
+            </Tbody>
+          </Table>
+        </Box>{' '}
+        <Text paddingTop={2}>
+          Waktu Pemesanan: {year}-{month}-{day} ({hours}.{minutes})
+        </Text>
         {feedback && (
           <Box mb={4}>
             <Badge colorScheme="teal" fontSize="sm" mb={2}>
@@ -33,33 +83,8 @@ const ReceiptCard = ({ orderData }) => {
             <Text>{feedback}</Text>
           </Box>
         )}
-        {/* Order Details */}
-        <Box mb={4}>
-          <Badge colorScheme="teal" fontSize="sm" mb={2}>
-            Order Details
-          </Badge>
-          <Text>
-            Nama: {nama} - No Meja: {nomeja}
-          </Text>
-          <Text>Note: {note}</Text>
-          <Text>Opsi: {opsi}</Text>
-        </Box>
-        {/* Ordered Items */}
-        <Box>
-          <Badge colorScheme="teal" fontSize="sm" mb={2}>
-            Ordered Items
-          </Badge>
-          {order.map((item, index) => (
-            <Text key={index}>
-              {item.nama} - Qty: {item.jumlah} - Price: ${item.harga}
-            </Text>
-          ))}
-        </Box>{' '}
-        <Text>
-          Total: {total} - No Meja: {year}-{month}-{day} ({hours}.{minutes})WIB
-        </Text>
       </Box>
-    </div>
+    </Container>
   )
 }
 

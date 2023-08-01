@@ -29,6 +29,7 @@ const Logo = () => {
       <LogoBox>
         <Image src={printimg} width={20} height={20} />
         <Text
+          paddingLeft={2}
           color={useColorModeValue('gray.800', 'whiteAlpha.900')}
           fontFamily='M PLUS Rounded 1c", sans-serif'
           fontWeight="bold"

@@ -1,7 +1,13 @@
-import { Container, Heading, SimpleGrid, Divider } from '@chakra-ui/react'
+import { Container, Heading, SimpleGrid, Divider, Text } from '@chakra-ui/react'
 import Layout from '../components/layouts/article'
 import { useState, useEffect } from 'react'
-import { getFirestore, collection, onSnapshot } from 'firebase/firestore'
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  query,
+  orderBy
+} from 'firebase/firestore'
 import firebaseConfig from '../components/firebaseConfig'
 import { initializeApp } from 'firebase/app'
 import ReceiptCard from '../components/receiptcard'
@@ -15,7 +21,7 @@ const Order = () => {
 
     // Start listening for changes to the "order" collection
     const unsubscribe = onSnapshot(
-      orderCollection,
+      query(orderCollection, orderBy('date', 'desc')),
       snapshot => {
         const updatedOrders = [] // Create a new array to store the updated data
         snapshot.forEach(doc => {
@@ -47,7 +53,7 @@ const Order = () => {
       <Heading as="h3" fontSize={20} mb={4}>
         Order
       </Heading>
-      Total Order : {orders.length}
+      <Text p={2}>Total Order : {orders.length}</Text>
       {orders.map((orderData, index) => (
         <ReceiptCard key={index} orderData={orderData} />
       ))}

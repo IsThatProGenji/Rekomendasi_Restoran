@@ -17,7 +17,7 @@ import {
 } from '@chakra-ui/react'
 import { HamburgerIcon } from '@chakra-ui/icons'
 import ThemeToggleButton from './theme-toggle-button'
-import { IoLogoGithub } from 'react-icons/io5'
+import { IoLogoInstagram } from 'react-icons/io5'
 import DrawerExample from './drawer'
 import MyContext from './myContext'
 const LinkItem = ({ href, path, target, children, ...props }) => {
@@ -81,21 +81,23 @@ const Navbar = props => {
           <LinkItem href="/order" path={path}>
             Order History
           </LinkItem>
-          <LinkItem href="/posts" path={path}>
-            Posts
-          </LinkItem>
-          <LinkItem href="https://uses.craftz.dog/">Uses</LinkItem>
           <LinkItem
             target="_blank"
-            href="https://github.com/craftzdog/craftzdog-homepage"
+            href="https://gofood.co.id/id/bandung/restaurant/atok-rizal-jagonya-sate-nasi-goreng-ikan-bakar-setiabudi-3eb0fa10-cee3-4636-865e-327fe3f1d7e8"
+          >
+            Delivery
+          </LinkItem>
+          <LinkItem
+            target="_blank"
+            href="https://instagram.com/atokrizaljagonyasate2?igshid=NjIwNzIyMDk2Mg=="
             path={path}
             display="inline-flex"
             alignItems="center"
             style={{ gap: 4 }}
             pl={2}
           >
-            <IoLogoGithub />
-            Source
+            <IoLogoInstagram />
+            Social
           </LinkItem>
         </Stack>
 
@@ -115,23 +117,23 @@ const Navbar = props => {
                 aria-label="Options"
               />
               <MenuList>
-                <MenuItem as={MenuLink} href="/">
-                  About
-                </MenuItem>
-                <MenuItem as={MenuLink} href="/works">
-                  Works
-                </MenuItem>
-                <MenuItem as={MenuLink} href="/posts">
-                  Posts
-                </MenuItem>
-                <MenuItem as={MenuLink} href="https://uses.craftz.dog/">
-                  Uses
+                <MenuItem as={MenuLink} href="/order">
+                  Order History
                 </MenuItem>
                 <MenuItem
-                  as={Link}
-                  href="https://github.com/craftzdog/craftzdog-homepage"
+                  as={MenuLink}
+                  target="_blank"
+                  href="https://instagram.com/atokrizaljagonyasate2?igshid=NjIwNzIyMDk2Mg=="
                 >
-                  View Source
+                  Social
+                </MenuItem>
+
+                <MenuItem
+                  as={MenuLink}
+                  target="_blank"
+                  href="https://gofood.co.id/id/bandung/restaurant/atok-rizal-jagonya-sate-nasi-goreng-ikan-bakar-setiabudi-3eb0fa10-cee3-4636-865e-327fe3f1d7e8"
+                >
+                  Delivery
                 </MenuItem>
               </MenuList>
             </Menu>
